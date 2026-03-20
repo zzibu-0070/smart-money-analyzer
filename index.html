@@ -661,6 +661,9 @@ h1{font-size:18px;font-weight:700;color:#1F2328;margin-bottom:4px}
 .subtitle{font-size:12px;color:#656D76;margin-bottom:14px}
 .badge-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
 .badge{border-radius:20px;font-size:10px;font-weight:600;padding:3px 10px}
+.summary-row{font-size:11px;line-height:1.9;margin-bottom:10px;color:#1F2328}
+.summary-row .si{font-weight:700;color:#CF222B;margin-right:2px}
+.summary-row .sk{font-weight:700;color:#1F2328}
 \`\`\`
 
 ■ Chart.js 전역 설정 (script 최상단에 반드시 포함)
@@ -760,19 +763,30 @@ new Chart(document.getElementById('shortChart'),{
 
 ━━ [GEX 수직 바차트 — SECTION 3 필수] ━━
 【반드시 준수】 Call OI는 옵션 체인 왼쪽, Put OI는 오른쪽. 절대 바꾸지 말 것.
+
+【GEX 범위 — 반드시 전체 스트라이크 포함】
+strikes 배열에 현재가 근방만 넣지 말 것.
+옵션 체인 이미지에 보이는 모든 스트라이크($17.50~$75 등)를 전부 포함해야
+GEX가 (−)로 전환되는 하방 구간과 상방 저항 구간 전체가 보입니다.
+이를 통해 가격이 하락 시 어느 스트라이크까지 흘러내릴 수 있는지,
+상승 시 어느 공급벽에 막히는지를 파악할 수 있습니다.
+
 GEX 계산:
-  ① 거리 가중치(w): 현재가 ±2.5%=1.0, ±5%=0.9, ±10%=0.65, ±15%=0.35, ±20%+=0.18, 원거리=0.07
-  ② Net GEX(strike) = (Call_OI - Put_OI) × w
-  ③ 플립 존: 부호 전환 구간 + 현재가 ±$1 이내 구간 → amber 색상
+  ① 전체 스트라이크 포함: 옵션 체인에 나타난 모든 Strike 행 사용
+  ② 거리 가중치(w): 현재가 ±2.5%=1.0, ±5%=0.9, ±10%=0.65, ±15%=0.35, ±20%=0.18, 원거리=0.07
+  ③ Net GEX(strike) = (Call_OI - Put_OI) × w
+  ④ 플립 존: 부호 전환 구간 + 현재가 ±$1 이내 구간 → amber 색상
+  ⑤ 차트 높이는 strikes 수에 비례해 조정: 스트라이크 15개 이하→220px, 20개→260px, 25개+→300px
 \`\`\`html
-<div class="chart-box" style="height:220px"><canvas id="gexChart"></canvas></div>
+<div class="chart-box" style="height:260px"><canvas id="gexChart"></canvas></div>
 \`\`\`
 \`\`\`javascript
 const spot = 현재가숫자;
-const strikes = [이미지옵션체인에서읽은Strike배열];
+// 옵션 체인의 모든 Strike 포함 — 현재가 근방만 넣으면 안 됨
+const strikes = [옵션체인_전체_Strike배열]; // 예: ['$17.5','$20','$22.5','$25',...,'$50','$55','$60']
 // 【중요】 Call OI = 옵션체인 왼쪽 OI 컬럼, Put OI = 오른쪽 OI 컬럼
-const callOI = [옵션체인왼쪽OI배열]; // 절대 Put OI와 바꾸지 말 것
-const putOI  = [옵션체인오른쪽OI배열]; // 절대 Call OI와 바꾸지 말 것
+const callOI = [옵션체인_왼쪽_OI_전체배열]; // 절대 Put OI와 바꾸지 말 것
+const putOI  = [옵션체인_오른쪽_OI_전체배열]; // 절대 Call OI와 바꾸지 말 것
 const weights = strikes.map(s => {
   const pct = Math.abs(parseFloat(s.replace('$','')) - spot) / spot * 100;
   if(pct <= 2.5) return 1.0;
@@ -799,7 +813,7 @@ new Chart(document.getElementById('gexChart'),{
         afterLabel:c=>flipIndices.has(c.dataIndex)?'→ 플립 존':c.parsed.y>0?'→ (+)감마 핀 압력':'→ (−)감마 증폭'
       }}},
     scales:{
-      x:{ticks:{color:tc,font:{size:9,family:F},maxRotation:45},grid:{color:gc}},
+      x:{ticks:{color:tc,font:{size:8,family:F},maxRotation:45},grid:{color:gc}},
       y:{ticks:{color:tc,font:{size:9,family:F},callback:v=>v.toLocaleString()},grid:{color:gc},
         title:{display:true,text:'Net GEX (가중)',color:tc,font:{size:9,family:F}}}
     }}
@@ -878,7 +892,14 @@ SECTION 5. 3-Layer 통합 시나리오 [섹션 헤더에 핵심 포인트 배지
 - 핵심 가격 레벨 table.t: 레벨, GEX구조, 역할, 현재상태, 돌파/이탈 시 다음레벨
 
 SECTION 6. 요약 및 대응 포인트 [섹션 헤더에 핵심 포인트 배지 필수]
-- 3줄 요약: ① 다크풀 결론(흡수율+VWAP앵커) ② 공매도 결론(케이스판별+CTB) ③ 옵션 결론(GEX구조+시나리오)
+- 3줄 요약: 반드시 .summary-row 클래스 사용 (al박스 사용 금지, font-size 11px로 통일)
+\`\`\`html
+<div class="summary-row">
+  <span class="si">①</span><span class="sk">다크풀 결론:</span> 기관 흡수율 N% + VWAP 앵커 $N — [구조적 의미]<br>
+  <span class="si">②</span><span class="sk">공매도 결론:</span> [케이스 판별 결과] — CTB N% [의미]<br>
+  <span class="si">③</span><span class="sk">옵션 결론:</span> Max Pain $N + GEX 플립 $N — [시나리오]
+</div>
+\`\`\`
 - 트리거 체크리스트 table.t: 항목, 강세 확인 신호, 약세 전환 신호, 즉각 행동
 - 리스크 al-neg 박스 (구체적 수치 포함)
 
