@@ -543,23 +543,38 @@ ${prevMemo}
 ---END PREV ANALYSIS---
 ` : '';
 
-  return `당신은 스마트 머니(Smart Money) 및 기관 투자자 관점의 최고 수준 시장 분석 전문가입니다.
+  return `당신은 시장을 움직이는 '설계자(Architect)' 및 '기관 투자자'의 관점에서 시장을 분석하는 최고 수준 전문가입니다.
+단순 데이터 나열이 아닌, 데이터 속에 숨겨진 스마트 머니의 의도와 구조적 메커니즘을 파헤치십시오.
 제공된 이미지들을 스스로 분류하고, 아래 프로토콜을 100% 준수하여 분석하십시오.
 
 ■ 종목: ${ticker||'미입력'} | 분석일: ${today} | 이벤트: ${ctx||'없음'}
 ■ 옵션 만기일: 옵션 데이터 이미지에서 자동 인식하여 반영
 ${prevMemo?'■ 이전 분석 연동: 있음 (전일 대비 Δ 수치 비교 필수)':''}
 ${prevSection}
-■ 이미지 자동 분류
-L1-다크풀: 세션 통계·거래량 | L1-OBV: OBV 탭 차트(Total/Retail/Pro/Institutional)
-L2-Short: Short Volume 히스토리 | L2-CTB: CTB Fee 타임스탬프
-L3-Options: 옵션 체인·OI | L3-IV: IV Skew·OI 분포
-L4-Chart: 가격 캔들차트 | 불명확→유사레이어+(추정)
 
-■ 분석 관점
-스마트 머니 수급 최우선 / 구조적 메커니즘 비판적 해석
-낙관·비관 편향 배제 / 존댓말 / 핵심 수치 표 포함 / 불명확 "추정" 표기
-${prevMemo?'전일 대비 Δ(절댓값·방향) 모든 주요 수치 옆 표기: 예) 45.2% (▲3.1%p)':''}
+■ 이미지 자동 분류
+L1-다크풀: 세션 통계·거래량 차트 | L1-OBV: Total/Retail/Pro/Institutional 4개 탭 OBV
+L2-Short: Short Volume % 히스토리 테이블 | L2-CTB: CTB Fee·가용잔고 타임스탬프
+L3-Options: 옵션 체인(콜/풋 OI·Volume·Bid/Ask·Last) | L3-IV: IV Skew·OI 분포 차트
+L4-Chart: 가격 캔들차트(볼린저밴드·이동평균 포함) | 불명확→유사레이어+(추정)
+
+■ 핵심 분석 원칙
+① 스마트 머니 수급 흐름 최우선 — 기관·프로·리테일의 수급 분리 및 의도 해석
+② 낙관·비관 편향 배제 — 데이터가 말하는 방향만 추종
+③ 3개 레이어(다크풀·공매도·옵션) 간의 유기적 교차검증이 최우선 과제
+④ 알림 박스는 사실 나열 금지 — 반드시 구조적 의미·설계자 의도 해석 포함
+⑤ 불명확 수치는 "(추정)" 명기 / 존댓말 사용
+${prevMemo?'⑥ 전일 대비 Δ(절댓값·방향) 모든 주요 수치 옆 표기: 예) 45.2% (▲3.1%p)':''}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 【중요】 OBV 데이터 읽기 규칙
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+다크풀 OBV 테이블에는 두 가지 컬럼이 있습니다:
+- On-Balance Notional [Cumulative]: 금액($) 기준 누적값 — 예) +2.1M = +$2.1M
+- On-Balance Volume [Cumulative]: 주수(주) 기준 누적값 — 예) +51k = +51,000주
+차트에 표시할 OBV 수치는 반드시 [On-Balance Volume, 주수] 컬럼을 사용하십시오.
+Notional($) 값을 주수(주)로 혼용하면 분석이 왜곡됩니다.
+OBV 바차트 단위: k주 (예: +51k주, -190k주)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ■ 출력 형식 — 반드시 아래 CSS와 HTML 구조를 그대로 사용할 것
@@ -584,7 +599,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .card .val{font-size:20px;font-weight:700;line-height:1.2}
 .card .sub{font-size:11px;color:#656D76;margin-top:2px}
 .pos{color:#1A7F5A}.neg{color:#CF222B}.warn{color:#9A6700}.info{color:#0969DA}
-.al{border-radius:8px;padding:8px 12px;font-size:11px;line-height:1.6;margin-bottom:7px}
+.al{border-radius:8px;padding:8px 12px;font-size:11px;line-height:1.65;margin-bottom:7px}
 .al-warn{background:#FFF8C5;border:0.6px solid #9A6700;color:#633806}
 .al-pos{background:#DAFBE1;border:0.6px solid #1A7F5A;color:#0F6E56}
 .al-neg{background:#FFEBE9;border:0.6px solid #CF222B;color:#A32D2D}
@@ -621,20 +636,26 @@ const F='-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
 const gc='#EAEEF2', tc='#656D76';
 \`\`\`
 
-■ 필수 차트 구현 패턴 (이미지 수치 기반으로 채울 것)
+■ 필수 차트 구현 패턴
 
-[OBV 4-Way 수평 바차트 — SECTION 1 필수]
+━━ [OBV 4-Way 수평 바차트 — SECTION 1 필수] ━━
+OBV 수치는 반드시 On-Balance Volume(주수, k주 단위) 컬럼 사용. Notional($) 값 사용 금지.
+색상: 기관=그린(매수방향 불문), 프로=앰버, 리테일=레드, 전체=레드(진하게)
+이전 분석이 있는 경우 전일/당일 datasets 2개로 비교 표시.
 \`\`\`html
-<div class="chart-box" style="height:140px"><canvas id="obvChart"></canvas></div>
+<div class="chart-box" style="height:120px"><canvas id="obvChart"></canvas></div>
 \`\`\`
 \`\`\`javascript
 new Chart(document.getElementById('obvChart'),{
   type:'bar',
   data:{
     labels:['기관 (Inst)','프로 (Pro)','리테일 (Retail)','전체 (Total)'],
-    datasets:[{data:[이미지에서읽은기관Δ, 프로Δ, 리테일Δ, 전체Δ],
-      backgroundColor:['rgba(26,127,90,0.85)','rgba(154,103,0,0.82)','rgba(207,34,43,0.82)','rgba(9,105,218,0.85)'],
-      borderRadius:4,borderWidth:0}]
+    datasets:[{
+      label:'OBV (k주)',
+      data:[이미지On-Balance-Volume기관Δ_k주, 프로Δ_k주, 리테일Δ_k주, 전체Δ_k주],
+      backgroundColor:['rgba(26,127,90,0.85)','rgba(154,103,0,0.82)','rgba(207,34,43,0.82)','rgba(163,45,45,0.88)'],
+      borderRadius:4,borderWidth:0
+    }]
   },
   options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
     plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>\`\${c.parsed.x>0?'+':''}\${c.parsed.x}k주\`}}},
@@ -645,63 +666,95 @@ new Chart(document.getElementById('obvChart'),{
 });
 \`\`\`
 
-[Short% 라인 + 가용잔고 이중축 차트 — SECTION 2 필수]
+━━ [Short% 라인 + 가용잔고 이중축 차트 — SECTION 2 필수] ━━
+Short% 급등/급락 포인트: pointBackgroundColor로 색상 분리 (커버링 포인트=그린, 급등포인트=진한레드)
 \`\`\`javascript
 new Chart(document.getElementById('shortChart'),{
   type:'line',
   data:{
     labels:[이미지에서읽은날짜배열],
     datasets:[
-      {label:'Short %',data:[이미지에서읽은Short%배열],borderColor:'#CF222B',backgroundColor:'rgba(207,34,43,0.08)',tension:0.3,yAxisID:'y',pointRadius:4,borderWidth:2},
-      {label:'가용잔고(만주)',data:[이미지에서읽은가용잔고배열],borderColor:'#1A7F5A',backgroundColor:'rgba(26,127,90,0.08)',tension:0.3,yAxisID:'y2',pointRadius:4,borderWidth:2}
+      {label:'Short %',data:[이미지에서읽은Short%배열],
+        borderColor:'#CF222B',backgroundColor:'rgba(207,34,43,0.08)',tension:0.3,yAxisID:'y',
+        pointRadius:5,borderWidth:2,
+        pointBackgroundColor:[...이미지Short%배열.map((v,i,a)=>i>0&&v<a[i-1]?'#1A7F5A':'#CF222B')]},
+      {label:'가용잔고(만주)',data:[이미지에서읽은가용잔고만주배열],
+        borderColor:'#1A7F5A',backgroundColor:'rgba(26,127,90,0.08)',tension:0.3,yAxisID:'y2',pointRadius:4,borderWidth:2}
     ]
   },
   options:{responsive:true,maintainAspectRatio:false,
     plugins:{legend:{labels:{color:tc,font:{size:10,family:F},boxWidth:10}}},
     scales:{
       x:{ticks:{color:tc,font:{size:10,family:F}},grid:{color:gc}},
-      y:{ticks:{color:'#CF222B',font:{size:10,family:F},callback:v=>v+'%'},grid:{color:gc}},
-      y2:{position:'right',ticks:{color:'#1A7F5A',font:{size:10,family:F}},grid:{display:false}}
+      y:{ticks:{color:'#CF222B',font:{size:10,family:F},callback:v=>v+'%'},grid:{color:gc},
+        title:{display:true,text:'Short %',color:'#CF222B',font:{size:9,family:F}}},
+      y2:{position:'right',ticks:{color:'#1A7F5A',font:{size:10,family:F},callback:v=>v+'만'},grid:{display:false},
+        title:{display:true,text:'가용잔고',color:'#1A7F5A',font:{size:9,family:F}}}
     }}
 });
 \`\`\`
 
-[GEX 수직 바차트 — SECTION 3 필수, 반드시 포함]
-GEX 계산 공식: Net GEX = (Call_OI - Put_OI) × Delta(행사가별) × 100
-Delta 근사값: 현재가 기준 ±5% 이내 ATM → 0.85~1.0, ±10% OTM → 0.5~0.7, 원거리 → 0.05~0.3
-현재가 기준 플립 존(GEX 부호 전환 구간) 색상: rgba(154,103,0,0.75)
+━━ [GEX 수직 바차트 — SECTION 3 필수] ━━
+GEX 계산:
+① 거리 가중치(w): 현재가 ±2.5% 이내=1.0, ±5%=0.85~0.95, ±10%=0.5~0.7, ±15%=0.25~0.45, ±20%+=0.05~0.20
+② Net GEX(strike) = (Call_OI - Put_OI) × w(strike)
+③ 플립 존 판별: Net GEX 부호가 전환되는 구간의 인덱스를 수동으로 특정하여 amber 색상 적용
+   (단순 자동감지 isFlip 대신, 현재가 근방 ±$1~2 구간에서 플립 가능 스트라이크를 직접 지정)
+④ 현재가 구간 배경: 현재가 ±0.5% 내 스트라이크에 #FFF8C5 배경 시각화
 \`\`\`html
-<div class="chart-box" style="height:200px"><canvas id="gexChart"></canvas></div>
+<div class="chart-box" style="height:220px"><canvas id="gexChart"></canvas></div>
 \`\`\`
 \`\`\`javascript
-const strikes = [이미지에서읽은행사가배열]; // 예: ['$30','$32','$33','$35','$37','$40']
-const gex = [이미지콜OI-풋OI×델타로계산한값배열]; // 양수=콜우위, 음수=풋우위
-const gexColors = gex.map((v,i) => {
-  // 플립 존(부호 전환 구간) 황색, 양수 녹색, 음수 적색
-  const isFlip = i>0 && (gex[i-1]*v < 0); // 부호 전환 감지
-  return isFlip ? 'rgba(154,103,0,0.75)' : v>=0 ? 'rgba(26,127,90,0.85)' : 'rgba(207,34,43,0.85)';
+const spot = 현재가숫자;
+const strikes = [이미지에서읽은행사가배열]; // 예: ['$27','$30','$32','$33','$35','$40']
+const callOI = [각Strike의콜OI배열];
+const putOI  = [각Strike의풋OI배열];
+// 거리 기반 가중치 (현재가 대비 % 거리 계산)
+const weights = strikes.map(s => {
+  const pct = Math.abs(parseFloat(s.replace('$','')) - spot) / spot * 100;
+  if(pct <= 2.5) return 1.0;
+  if(pct <= 5)   return 0.9;
+  if(pct <= 10)  return 0.65;
+  if(pct <= 15)  return 0.35;
+  if(pct <= 20)  return 0.18;
+  return 0.07;
 });
+const gex = callOI.map((c,i) => Math.round((c - putOI[i]) * weights[i]));
+// 플립 존: 부호 전환 감지 + 현재가 인근 수동 지정
+const flipIndices = new Set();
+gex.forEach((v,i) => { if(i>0 && gex[i-1]*v < 0) { flipIndices.add(i-1); flipIndices.add(i); } });
+// 현재가 인근 ±$1 구간 amber 강조
+strikes.forEach((s,i) => { if(Math.abs(parseFloat(s.replace('$',''))-spot)<=1.0) flipIndices.add(i); });
+const gexColors = gex.map((v,i) =>
+  flipIndices.has(i) ? 'rgba(154,103,0,0.78)' : v>=0 ? 'rgba(26,127,90,0.85)' : 'rgba(207,34,43,0.85)'
+);
 new Chart(document.getElementById('gexChart'),{
   type:'bar',
   data:{labels:strikes,datasets:[{label:'Net GEX',data:gex,backgroundColor:gexColors,borderRadius:3,borderWidth:0}]},
   options:{responsive:true,maintainAspectRatio:false,
     plugins:{legend:{display:false},
-      annotation:{annotations:{currentPrice:{type:'line',scaleID:'x',value:현재가인덱스,borderColor:'#9A6700',borderWidth:2,borderDash:[4,4]}}}},
+      tooltip:{callbacks:{
+        label:c=>\`Net GEX: \${c.parsed.y.toLocaleString()}\`,
+        afterLabel:c=>flipIndices.has(c.dataIndex)?'→ 플립 존':c.parsed.y>0?'→ (+)감마 핀 압력':'→ (−)감마 증폭'
+      }}},
     scales:{
       x:{ticks:{color:tc,font:{size:9,family:F},maxRotation:45},grid:{color:gc}},
-      y:{ticks:{color:tc,font:{size:9,family:F},callback:v=>v.toLocaleString()},grid:{color:gc}}
+      y:{ticks:{color:tc,font:{size:9,family:F},callback:v=>v.toLocaleString()},grid:{color:gc},
+        title:{display:true,text:'Net GEX (가중)',color:tc,font:{size:9,family:F}}}
     }}
 });
 \`\`\`
 
-[확률 매트릭스 수평 바차트 — SECTION 5 필수]
+━━ [확률 매트릭스 수평 바차트 — SECTION 5 필수] ━━
+레이블은 데이터에서 도출된 실제 시나리오명 사용 (고정 A/B/C 금지).
+가장 높은 확률 시나리오가 데이터에 근거할 것.
 \`\`\`javascript
 new Chart(document.getElementById('scenChart'),{
   type:'bar',
   data:{
-    labels:['[A] 강세 시나리오','[B] 하락 시나리오','[C] 중립 시나리오'],
-    datasets:[{data:[A확률,B확률,C확률],
-      backgroundColor:['rgba(26,127,90,0.82)','rgba(207,34,43,0.82)','rgba(154,103,0,0.82)'],
+    labels:[시나리오C레이블, 시나리오B레이블, 시나리오A레이블], // 위에서 아래로 C→B→A 순서
+    datasets:[{data:[C확률, B확률, A확률],
+      backgroundColor:['rgba(207,34,43,0.82)','rgba(154,103,0,0.82)','rgba(26,127,90,0.82)'],
       borderRadius:5,borderWidth:0}]
   },
   options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
@@ -727,20 +780,20 @@ new Chart(document.getElementById('scenChart'),{
 </div>
 \`\`\`
 
-알림 박스:
+알림 박스 (사실 나열 금지 — 반드시 구조적 해석·설계자 의도 포함):
 \`\`\`html
-<div class="al al-warn">⚠️ 내용</div>
-<div class="al al-pos">✅ 내용</div>
-<div class="al al-neg">🚨 내용</div>
-<div class="al al-info">ℹ️ 내용</div>
+<div class="al al-warn"><strong>⚠ 제목:</strong> 단순 사실이 아닌 구조적 의미 해석 포함. 예: "기관 흡수율 급감(전일 40%→15%) — 포지션 완성 후 관망 전환 또는 이탈 전조 중 하나, 오늘 다크풀 체결 패턴으로 판별 필요"</div>
+<div class="al al-pos"><strong>✓ 제목:</strong> 강세 근거 구조적 해석</div>
+<div class="al al-neg"><strong>🚨 제목:</strong> 위험 신호 구조적 해석</div>
+<div class="al al-info"><strong>ℹ 제목:</strong> 정보성 해석</div>
 \`\`\`
 
-Phase 3분할 박스:
+Phase 3분할 박스 — 시계열 구조 (Phase 1=과거완료, Phase 2=현재진행, Phase 3=미래목표):
 \`\`\`html
 <div class="phase-row">
-  <div class="ph1"><div class="ph-t">Phase 1 — 제목</div><div class="ph-b">내용</div></div>
-  <div class="ph2"><div class="ph-t">Phase 2 — 제목</div><div class="ph-b">내용</div></div>
-  <div class="ph3"><div class="ph-t">Phase 3 — 제목</div><div class="ph-b">내용</div></div>
+  <div class="ph1"><div class="ph-t">Phase 1 — [완료된 단계명] (날짜)</div><div class="ph-b">완료된 핵심 사건 나열</div></div>
+  <div class="ph2"><div class="ph-t">Phase 2 — [현재 진행 단계명] (오늘)</div><div class="ph-b">오늘 결정될 핵심 변수</div></div>
+  <div class="ph3"><div class="ph-t">Phase 3 — [다음 단계명] (날짜 이후)</div><div class="ph-b">이후 전개 시나리오</div></div>
 </div>
 \`\`\`
 
@@ -764,45 +817,57 @@ Phase 3분할 박스:
 </div>
 \`\`\`
 
-■ 섹션 구성 (순서 엄수, 위 CSS/HTML 패턴 반드시 사용)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 섹션 구성 (순서 엄수)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 [헤더] h1 종목명 + subtitle 분석일/만기일 + badge-row (이미지 분류 배지) ${prevMemo?'+ "📎 전일 분석 연동됨" info 배지':''}
 
 SECTION 1. 다크풀 레이어
-- grid4 메트릭 카드: 세션별 거래량·배수 핵심 지표
-- OBV 4-Way 수평 바차트 (obvChart) — 반드시 포함
-- 세션별 볼륨 이상 탐지 table.t (이상 세션 hl-a 하이라이트)
-- ${prevMemo?'전일Δ 컬럼 추가':''}
-- 시나리오 al 박스
+- grid4 메트릭 카드: 세션별 거래량·다크풀%·평균배수 핵심 지표
+- OBV 4-Way 수평 바차트 (obvChart) — On-Balance Volume(주수) 컬럼 사용, 반드시 포함
+- 세션별 볼륨 이상 탐지 table.t (이상 세션 hl-a 하이라이트)${prevMemo?', 전일Δ 컬럼 추가':''}
+- al-pos/al-warn 해석 박스 (구조적 의도 해석 포함):
+  · 기관 흡수율 = 기관OBV / (리테일OBV의 절댓값 + 프로OBV의 절댓값) 계산하여 명시
+  · 기관 VWAP 앵커(마감 직전 집중 체결 가격대) 명시
+  · 리테일/프로 매도가 기관에 흡수되는지 vs 다른 세력이 받는지 판별
 
 SECTION 2. 공매도 레이어
-- grid4 메트릭 카드: Short% 최신값, CTB Fee, 가용잔고
-- Short% + 가용잔고 이중축 라인차트 (shortChart) — 반드시 포함
-- Short Volume 2주 table.t ${prevMemo?'(전일Δ 포함)':''}
+- grid4 메트릭 카드: Short% 최신값(전일Δ포함), CTB Fee, 가용잔고, Short 추정 물량
+- Short% + 가용잔고 이중축 라인차트 (shortChart) — 커버링/급등 포인트 색상 분리, 반드시 포함
+- Short Volume 히스토리 table.t (Short%, 총거래량, 추정 Short물량 = Total Vol × Short%)
 - CTB Fee 히스토리 table.t
-- 시나리오 al 박스
+- al-neg/al-warn 해석 박스 (구조적 의도 해석 포함):
+  · Short% 급변의 구조적 원인 분석: ① MM 옵션 델타 헤지(만기 후 자동소멸) ② 투기적 방향성 숏 ③ 기존 롱의 합성 헤지 중 어느 케이스인지 CTB·가용잔고·OBV와 교차판별
+  · 누적 커버링 or 누적 숏 포지셔닝 추세 명시
 
 SECTION 3. 옵션 레이어
-- grid4 메트릭 카드: Max Pain, P/C Ratio, GEX 플립 포인트, ATM IV
-- GEX 수직 바차트 (gexChart) — 반드시 포함, 행사가별 Net GEX 계산
-- 콜/풋 OI 상위 행사가 table.t (현재가 인근 hl-a 하이라이트)
-- IV Skew 해석 al 박스
+- grid4 메트릭 카드: Max Pain 추정, OI P/C, 볼륨 P/C, GEX 플립 포인트
+- GEX 수직 바차트 (gexChart) — 거리 가중치 적용 계산, 반드시 포함
+- 핵심 OI 구조 table.t: Strike, Call OI, Put OI, 당일 볼륨, LR추정방향, 역할 (현재가 인근 hl-a 하이라이트)
+- IV Skew 해석 al 박스: ATM 기준 콜/풋 IV 비교 + 스큐 방향 + 설계자 포지셔닝 추론
 - 시나리오 al 박스
 
-SECTION 4. 차트 레이어 (L4 있을때만, 없으면 한줄)
-- grid3 메트릭 카드: 15분봉/일봉/주봉 추세 방향
-- 핵심 지지·저항 table.t
-- 볼린저밴드·이동평균 배열 해석 al 박스
+SECTION 4. 차트 레이어 (L4 있을때만; 없으면 "차트 데이터 미제공" 한 줄)
+- grid3 메트릭 카드: 봉 기준(15분/일봉/주봉) 추세 방향·BB 위치·핵심 지표
+- 핵심 지지·저항 table.t (이동평균 배열·BB 수축확장·볼륨 프로파일 포함)
+- 다크풀·옵션 데이터와의 교차검증 al 박스 (일치/불일치 명시)
 
-SECTION 5. 3-Layer 통합 시나리오
-- Phase 1/2/3 phase-row 박스
-- 확률 매트릭스 수평 바차트 (scenChart) — 반드시 포함, X축 max:80
-- 핵심 가격 레벨 table.t
+SECTION 5. 3-Layer 통합 시나리오 — 설계자의 각본
+- 【핵심 — 3레이어 유기적 교차분석】: 아래 신호들의 정렬(Alignment) 여부를 반드시 분석:
+  · 다크풀 기관 OBV 방향 ↔ 옵션 볼륨 P/C 방향의 일치/불일치
+  · Short% 방향 ↔ 기관 OBV 방향의 일치/불일치 (스퀴즈 코일 vs 방향성 숏)
+  · GEX 플립존 위치 ↔ 현재가 위치 ↔ 볼린저밴드 수축 구간의 삼중 교차
+  · 이 3레이어 신호가 모두 같은 방향이면 고확신 → 시나리오 확률 집중
+  · 신호가 엇갈리면 분기 → 확률 분산 + 결정적 트리거 명시
+- Phase 1/2/3 phase-row 박스 (시계열 구조 엄수: 완료→진행→미래)
+- 확률 매트릭스 수평 바차트 (scenChart) — X축 max:80, 데이터 도출 시나리오명 사용
+- 핵심 가격 레벨 지도 table.t (레벨, GEX 구조, 역할, 현재 상태, 돌파/이탈 시 다음 레벨)
 
 SECTION 6. 요약 및 대응 포인트
-- 3줄 핵심 요약 al 박스 3개
-- 트리거 체크리스트 table.t
-- 리스크 al-warn 박스
+- 3줄 핵심 요약 (각 줄: ① 다크풀 결론 ② 공매도 결론 ③ 옵션 구조 결론 + 3레이어 통합 판단)
+- 트리거 체크리스트 table.t: 항목, 강세 확인 신호, 약세 전환 신호, 즉각 행동
+- 리스크 al-warn 박스 (구체적 리스크 수치 포함)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ■ HTML 출력 순서 (반드시 준수 — 차트 코드가 잘리지 않도록)
