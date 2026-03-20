@@ -805,7 +805,16 @@ SECTION 6. 요약 및 대응 포인트
 - 리스크 al-warn 박스
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-【필수】SECTION 7: MD 아카이브 블록 (display:none 숨김)
+■ HTML 출력 순서 (반드시 준수 — 차트 코드가 잘리지 않도록)
+1. DOCTYPE ~ 섹션 1~6 본문 (canvas 태그 포함)
+2. 차트 초기화 JS 블록 ← 반드시 MD 아카이브보다 먼저
+3. div#md-archive ← 마지막
+
+모든 new Chart() 호출(obvChart, shortChart, gexChart, scenChart)을
+하나의 JS 블록 안에 완성하십시오. 차트 코드가 끊기면 차트가 표시되지 않습니다.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【필수】MD 아카이브 블록 (display:none, 차트 script 이후)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 <div id="md-archive" style="display:none">
 <pre id="md-archive-text">
@@ -956,7 +965,7 @@ async function startAnalysis() {
       },
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514',
-        max_tokens:8000,
+        max_tokens:16000,
         system:buildSystemPrompt(ticker,today.iso,ctx,memoContent),
         messages:[{role:'user',content}]
       })
