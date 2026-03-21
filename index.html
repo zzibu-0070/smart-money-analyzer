@@ -257,7 +257,7 @@
 <header>
   <div class="logo-mark">SM</div>
   <div class="header-info">
-    <div class="header-title">Smart Money Analyzer <span class="ver-badge">ver 1.1</span></div>
+    <div class="header-title">Smart Money Analyzer <span class="ver-badge">ver 1.2</span></div>
     <div class="header-sub">Institutional Flow Intelligence · 기관 수급 분석 엔진</div>
   </div>
   <div class="header-right">
@@ -280,6 +280,20 @@
       <button class="cl-close" onclick="closeChangelog()">✕</button>
     </div>
     <div class="cl-body">
+
+      <div class="cl-version">
+        <div class="cl-ver-tag">
+          <span class="cl-ver-num">ver 1.2</span>
+          <span class="cl-ver-date">2026-03-21</span>
+        </div>
+        <div class="cl-ver-label">거래일 캘린더 + 뉴스/이벤트/공시 자동 검색</div>
+        <div class="cl-item"><span class="cl-dot fix"></span><span><strong>Phase 날짜 거래일 보정</strong> — NYSE/NASDAQ 2026 휴장일·주말 목록 내장. Phase 1/2/3 날짜 범위 작성 시 실제 거래 가능일만 사용하도록 강제. 토/일·공휴일 포함된 일정 표기 방지.</span></div>
+        <div class="cl-item"><span class="cl-dot add"></span><span><strong>SECTION 0 — 뉴스·이벤트·공시 자동 검색</strong> — 분석 시 web_search 도구 활성화. 최근 1주일 뉴스(최대 5건), 향후 1개월 예정 이벤트(컨퍼런스·IR·제품 런치·테크 행사·규제 일정 등, 어닝콜 외 포함, 최대 5건), 최근 SEC 공시(8-K·Form 4 등, 최대 3건) 자동 수집 후 레포트 헤더 직후 3분할 카드로 표시.</span></div>
+        <div class="cl-item"><span class="cl-dot add"></span><span><strong>이벤트-Phase 교차 반영</strong> — 웹 검색으로 확인된 이벤트를 SECTION 5 Phase 날짜와 연계하여 시나리오에 반영.</span></div>
+        <div class="cl-item"><span class="cl-dot fix"></span><span><strong>API 멀티턴 루프</strong> — web_search 툴 사용 시 최대 5회 순환 처리. 검색 완료 후 이미지 분석으로 자동 이어짐.</span></div>
+      </div>
+
+      <div class="cl-divider"></div>
 
       <div class="cl-version">
         <div class="cl-ver-tag">
@@ -626,6 +640,92 @@ ${prevMemo}
 ${prevMemo?'■ 이전 분석 연동: 있음 (전일 대비 Δ 수치 비교 필수)':''}
 ${prevSection}
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 【NYSE 거래 캘린더 — 날짜 계획 필수 준수】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Phase 날짜 범위, 트리거 체크리스트 날짜, 모니터링 일정 등 모든 날짜 표기 시
+반드시 실제 거래 가능일만 사용하십시오.
+
+2026년 NYSE 휴장일 (이 날짜는 거래 불가):
+  1/1(목) 신정 | 1/19(월) MLK Day | 2/16(월) Presidents Day
+  4/3(금) Good Friday | 5/25(월) Memorial Day | 6/19(금) Juneteenth
+  7/3(금) Independence Day 대체 | 9/7(월) Labor Day
+  11/26(목) Thanksgiving | 12/25(금) Christmas
+
+주말(토·일)은 항상 거래 불가.
+
+날짜 계획 규칙:
+  - Phase 기간 표기 시: 토·일·공휴일은 건너뛰고 다음 거래일로 이동
+  - "3/22~24" 표기 예시: 3/22(일) = 건너뜀 → "3/23(월)~3/24(화)"로 수정
+  - 단일 트리거 날짜가 비거래일이면 "→ 다음 거래일 [날짜]"로 명시
+  - Phase 제목에 날짜 범위를 쓸 때는 항상 실거래일 기준으로 계산
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 【SECTION 0 — 뉴스 · 이벤트 · 공시 자동 검색】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+분석 리포트 본문(SECTION 1~6) 바로 앞에 SECTION 0을 출력하십시오.
+web_search 도구를 사용하여 아래 3가지를 검색한 뒤 요약하십시오.
+
+【검색 ① — 최근 1주일 주요 뉴스】
+  검색어: "${ticker||'해당종목'} news [분석일 기준 최근 7일]"
+  출력: 주요 뉴스 제목 + 1~2줄 요약 + 날짜 (최대 5건)
+  포함 기준: 수급/실적/계약/파트너십/규제/기술 발표에 영향을 줄 수 있는 것
+
+【검색 ② — 향후 1개월 예정 이벤트 (컨퍼런스·행사·발표 포함)】
+  검색어: "${ticker||'해당종목'} conference investor event presentation schedule 2026"
+  추가 검색어: "${ticker||'해당종목'} upcoming event catalyst [분석월]"
+  출력: 이벤트명 + 날짜 + 성격(컨퍼런스/IR/제품발표/규제일정 등) (최대 5건)
+  중요: 어닝콜뿐 아니라 회사가 참가·발표하는 컨퍼런스, 투자자 행사, 제품 런치,
+  FDA 일정, 파트너십 발표 예정 등 모든 카탈리스트 이벤트를 탐색할 것.
+  사용자가 이미 입력한 이벤트(${ctx||'없음'})와 비교하여 추가 발견된 항목 표시.
+
+【검색 ③ — 최근 공시 (SEC 8-K·10-Q·10-K)】
+  검색어: "${ticker||'해당종목'} SEC filing 8-K 10-Q site:sec.gov"
+  출력: 공시 유형 + 날짜 + 핵심 내용 1줄 요약 (최대 3건)
+
+SECTION 0 출력 HTML 구조:
+\`\`\`html
+<div class="sec">
+  <span class="sec-lbl">▶ SECTION 0 &nbsp; 뉴스 · 이벤트 · 공시 컨텍스트</span>
+  <div class="sec-kp">
+    <span class="kp kp-info">웹 검색 자동 수집</span>
+    <span class="kp kp-warn">[발견된 핵심 이벤트 1건]</span>
+  </div>
+</div>
+<div class="s0-grid">
+  <div class="s0-card">
+    <div class="s0-card-title">📰 최근 뉴스 (7일)</div>
+    [뉴스 항목들 — .s0-item 클래스]
+  </div>
+  <div class="s0-card">
+    <div class="s0-card-title">📅 예정 이벤트 (1개월)</div>
+    [이벤트 항목들 — .s0-item 클래스]
+  </div>
+  <div class="s0-card">
+    <div class="s0-card-title">📋 최근 공시</div>
+    [공시 항목들 — .s0-item 클래스]
+  </div>
+</div>
+\`\`\`
+
+SECTION 0 필수 CSS (style 블록에 추가):
+.s0-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.s0-card{background:#F6F8FA;border:0.5px solid #D0D7DE;border-radius:8px;padding:10px 12px}
+.s0-card-title{font-size:11px;font-weight:700;color:#1F2328;margin-bottom:6px}
+.s0-item{font-size:10px;color:#656D76;line-height:1.6;margin-bottom:5px;padding-bottom:5px;border-bottom:0.5px solid #EAEEF2}
+.s0-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.s0-item-date{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:9px;color:#9A6700;font-weight:600;margin-bottom:1px}
+.s0-item-title{font-size:10px;color:#1F2328;font-weight:500;line-height:1.4}
+.s0-item-desc{font-size:10px;color:#656D76;line-height:1.5;margin-top:1px}
+.s0-item-badge{display:inline-block;font-size:8px;font-weight:600;padding:1px 5px;border-radius:3px;margin-left:4px;vertical-align:middle}
+.s0-badge-conf{background:#DDF4FF;color:#0550AE;border:0.5px solid #0969DA}
+.s0-badge-earn{background:#DAFBE1;color:#0F6E56;border:0.5px solid #1A7F5A}
+.s0-badge-reg{background:#FFEBE9;color:#A32D2D;border:0.5px solid #CF222B}
+.s0-badge-sec{background:#FFF8C5;color:#633806;border:0.5px solid #9A6700}
+
+검색 결과가 없거나 불확실한 항목은 "검색 결과 없음" 또는 "(추정)" 명기.
+웹 검색 불가 시 SECTION 0 박스에 "웹 검색 도구 미활성화 — 수동 입력 이벤트만 반영" 안내.
+
 ■ 이미지 자동 분류
 L1-다크풀: 세션 통계·거래량 차트 | L1-OBV: Total/Retail/Pro/Institutional 4개 탭 OBV
 L2-Short: Short Volume % 히스토리 테이블 | L2-CTB: CTB Fee·가용잔고 타임스탬프
@@ -960,10 +1060,40 @@ new Chart(document.getElementById('scenChart'),{
 \`\`\`
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 【거래일 캘린더】 NYSE/NASDAQ 2026 휴장일 및 Phase 날짜 규칙
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2026년 NYSE/NASDAQ 휴장일 (거래 불가 — 절대 Phase 날짜로 지정 금지):
+  - 2026-01-01 (New Year's Day)
+  - 2026-01-19 (MLK Day)
+  - 2026-02-16 (Presidents' Day)
+  - 2026-04-03 (Good Friday)
+  - 2026-05-25 (Memorial Day)
+  - 2026-06-19 (Juneteenth)
+  - 2026-07-03 (Independence Day 대체 휴무)
+  - 2026-09-07 (Labor Day)
+  - 2026-11-26 (Thanksgiving)
+  - 2026-11-27 (Black Friday, 조기 마감 — 반일 거래)
+  - 2026-12-24 (Christmas Eve, 조기 마감 — 반일 거래)
+  - 2026-12-25 (Christmas Day)
+
+매주 토요일·일요일은 거래 불가.
+
+【Phase 날짜 작성 규칙 — 반드시 준수】
+Phase 1 / Phase 2 / Phase 3의 날짜 범위를 작성할 때:
+  ① 주말(토/일)과 위 공휴일은 건너뛰고 실제 거래 가능한 날만 사용하십시오.
+  ② 날짜 범위 표기 예시: "Phase 3 (3/23~3/27)" 이 아니라 주말 제외 후 실제 거래일 기준으로 표기.
+  ③ "다음 거래일"이 필요할 때: 금요일 분석이면 다음 거래일은 월요일.
+  ④ 만기일(옵션 만기)도 거래일 기준으로 확인 후 작성.
+  ⑤ Phase 날짜에 공휴일이 포함된다면 반드시 "(公 제외 거래일 기준)"이라고 명시.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ■ 섹션 구성 (순서 엄수)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 [헤더] h1 종목명 + subtitle 분석일/만기일/현재가 + badge-row (이미지 분류 배지) ${prevMemo?'+ "📎 전일 분석 연동됨" info 배지':''}
+
+SECTION 0은 위 【SECTION 0 — 뉴스 · 이벤트 · 공시 자동 검색】 블록 지시에 따라 헤더 바로 다음에 출력.
 
 SECTION 1. 다크풀 레이어 [섹션 헤더에 핵심 포인트 배지 필수]
 - grid4 메트릭 카드: 세션별 거래량·다크풀%·평균배수, 기관흡수율(기관OBV÷(|리테일|+|프로|)), VWAP 앵커
@@ -1008,6 +1138,7 @@ SECTION 5. 3-Layer 통합 시나리오 [섹션 헤더에 핵심 포인트 배지
   · GEX 플립존 ↔ 현재가 ↔ BB수축 삼중교차
   · 신호 정렬(all-in) → 고확신 집중 / 신호 분기 → 확률 분산 + 결정적 트리거 명시
 - Phase 1/2/3 phase-row (시계열 엄수: 완료날짜→오늘→미래날짜)
+  · 날짜는 반드시 실제 NYSE 거래일 기준. 주말·공휴일 포함 금지. 위 캘린더 규칙 적용.
 - 확률 매트릭스 수평 바차트 (scenChart) — X축 max:80, 데이터 기반 시나리오명
 - 핵심 가격 레벨 table.t: 레벨, GEX구조, 역할, 현재상태, 돌파/이탈 시 다음레벨
 
@@ -1142,6 +1273,7 @@ async function startAnalysis() {
   document.getElementById('empty-state').style.display = 'none';
 
   const phases=[
+    {t:'뉴스 · 이벤트 검색 중...',s:`${ticker} 최근 1주 뉴스 · 예정 행사 · 공시 자동 수집`},
     {t:'이미지 분류 중...',s:`${uploadedImages.length}개 이미지 레이어 자동 분류`},
     {t:'원본 수치 추출 중...',s:'옵션체인 · Short Volume · CTB 데이터 파싱'},
     {t:'스마트 머니 분석 중...',s:'다크풀 / 공매도 / 옵션 교차 검증'},
@@ -1157,52 +1289,80 @@ async function startAnalysis() {
   const bar=document.getElementById('loading-bar');
   bar.style.transition='none';bar.style.width='0%';
   void bar.offsetWidth;
-  bar.style.transition='width 26s cubic-bezier(0.1,0.4,0.2,1)';
+  bar.style.transition='width 36s cubic-bezier(0.1,0.4,0.2,1)';
   bar.style.width='88%';
 
   const today=getToday();
 
   try {
-    const content=[];
-    content.push({type:'text',text:`아래 ${uploadedImages.length}개 이미지는 ${ticker} 종목 스마트 머니 분석용 캡처입니다. 내용을 보고 레이어를 자동 분류하고, 이미지에서 읽을 수 있는 모든 수치를 빠짐없이 추출하여 분석해 주십시오.`});
+    const initContent=[];
+    initContent.push({type:'text',text:`아래 ${uploadedImages.length}개 이미지는 ${ticker} 종목 스마트 머니 분석용 캡처입니다. 분석 전에 웹 검색 도구를 사용하여 ① ${ticker} 최근 1주일 뉴스, ② ${ticker}가 참가 예정인 향후 1개월 내 컨퍼런스·행사·로드쇼 등 이벤트(어닝콜 외 테크/업계 행사 포함), ③ ${ticker} 최근 SEC 공시(8-K·Form 4 등)를 검색하십시오. 그 다음 이미지 내용을 보고 레이어를 자동 분류하고 수치를 추출하여 섹션 0~6 전체 리포트를 출력해 주십시오.`});
     uploadedImages.forEach((img,i)=>{
       const[,b64]=img.dataUrl.split(',');
-      content.push({type:'text',text:`[이미지 ${i+1}] ${img.name}`});
-      content.push({type:'image',source:{type:'base64',media_type:img.mtype,data:b64}});
+      initContent.push({type:'text',text:`[이미지 ${i+1}] ${img.name}`});
+      initContent.push({type:'image',source:{type:'base64',media_type:img.mtype,data:b64}});
     });
-    content.push({type:'text',text:'위 이미지들을 분석하여 섹션 1~6 리포트 + 섹션 7 MD 아카이브 블록(id="md-archive-text", display:none)이 포함된 완전한 HTML 문서를 출력하십시오. <!DOCTYPE html>로 시작하는 HTML 코드만 출력하십시오.'});
+    initContent.push({type:'text',text:'위 내용을 분석하여 섹션 0~6 리포트 + MD 아카이브 블록(id="md-archive-text", display:none)이 포함된 완전한 HTML 문서를 출력하십시오. <!DOCTYPE html>로 시작하는 HTML 코드만 출력하십시오.'});
 
     setStatus('active',`분석 중... ${ticker} · ${uploadedImages.length}img${memoContent?' · 전일연동':''}`);
 
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:16000,
-        system:buildSystemPrompt(ticker,today.iso,ctx,memoContent),
-        messages:[{role:'user',content}]
-      })
-    });
+    // 멀티턴 루프 — web_search 툴 사용 시 최대 5회 순환
+    let messages=[{role:'user',content:initContent}];
+    let html='';
+    const MAX_TURNS=5;
 
-    if(!res.ok){
-      const err=await res.json().catch(()=>({}));
-      // API Key 관련 오류 처리
-      if(res.status===401){
-        sessionStorage.removeItem('sma_api_key');
-        updateKeyUI();
-        throw new Error('API Key가 유효하지 않습니다. Key를 다시 확인하고 재설정해 주세요.');
+    for(let turn=0;turn<MAX_TURNS;turn++){
+      const res=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body:JSON.stringify({
+          model:'claude-sonnet-4-20250514',
+          max_tokens:16000,
+          system:buildSystemPrompt(ticker,today.iso,ctx,memoContent),
+          tools:[{type:'web_search_20250305',name:'web_search'}],
+          messages
+        })
+      });
+
+      if(!res.ok){
+        const err=await res.json().catch(()=>({}));
+        if(res.status===401){
+          sessionStorage.removeItem('sma_api_key');
+          updateKeyUI();
+          throw new Error('API Key가 유효하지 않습니다. Key를 다시 확인하고 재설정해 주세요.');
+        }
+        throw new Error(`API ${res.status}: ${err?.error?.message||res.statusText}`);
       }
-      throw new Error(`API ${res.status}: ${err?.error?.message||res.statusText}`);
+
+      const data=await res.json();
+
+      if(data.stop_reason==='end_turn'){
+        html=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+        break;
+      } else if(data.stop_reason==='tool_use'){
+        // 어시스턴트 메시지 추가
+        messages.push({role:'assistant',content:data.content});
+        // tool_result 메시지 추가 (web_search는 서버사이드 처리 — content 비워도 됨)
+        const toolResults=data.content
+          .filter(b=>b.type==='tool_use')
+          .map(b=>({type:'tool_result',tool_use_id:b.id,content:''}));
+        messages.push({role:'user',content:toolResults});
+        // 로딩 텍스트 업데이트
+        document.getElementById('loading-phase-title').textContent='뉴스 · 이벤트 검색 중...';
+        document.getElementById('loading-phase-text').textContent=`${ticker} 관련 정보 수집 완료, 분석 계속...`;
+      } else {
+        // max_tokens 등 다른 종료
+        html=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+        break;
+      }
     }
 
-    const data=await res.json();
-    let html=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+    if(!html) throw new Error('분석 결과를 생성하지 못했습니다. 다시 시도해 주세요.');
     html=html.replace(/^```html\s*/i,'').replace(/\s*```$/i,'').trim();
     if(!html.toLowerCase().startsWith('<!doctype')&&!html.toLowerCase().startsWith('<html')){
       html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:24px;max-width:960px;margin:auto;color:#1F2328;background:#fff}</style></head><body>${html}</body></html>`;
