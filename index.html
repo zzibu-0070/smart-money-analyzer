@@ -36,7 +36,7 @@
   /* ── HEADER ── */
   header{display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:100;box-shadow:var(--shadow)}
   .logo-mark{width:32px;height:32px;background:linear-gradient(135deg,#1A7F5A,#0E5C40);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 2px 5px rgba(26,127,90,.3)}
-  .header-info{flex:1}
+  .header-info{flex:1;display:flex;flex-direction:column;gap:2px}
   .header-title{font-size:13px;font-weight:600;color:var(--text)}
   .header-sub{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.07em;text-transform:uppercase}
   .header-right{display:flex;align-items:center;gap:7px}
@@ -45,6 +45,30 @@
   .theme-toggle:hover{border-color:var(--accent)}
   .manual-btn{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--card);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);transition:all .15s;text-decoration:none;white-space:nowrap}
   .manual-btn:hover{border-color:var(--info);color:var(--info);background:var(--info-bg)}
+  .ver-badge{font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;color:var(--accent);background:var(--accent-bg);border:1px solid var(--accent);border-radius:3px;padding:1px 4px;margin-left:5px;letter-spacing:.03em;vertical-align:middle;position:relative;top:-1px}
+  .changelog-btn{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--card);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);transition:all .15s;white-space:nowrap}
+  .changelog-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+  .cl-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:2000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+  .cl-backdrop.open{display:flex}
+  .cl-modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;width:520px;max-width:92vw;max-height:80vh;box-shadow:0 8px 32px rgba(0,0,0,0.15);display:flex;flex-direction:column;overflow:hidden}
+  .cl-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
+  .cl-title{font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
+  .cl-close{background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted);padding:2px 6px;border-radius:4px;transition:color .12s}
+  .cl-close:hover{color:var(--danger)}
+  .cl-body{overflow-y:auto;padding:16px 20px;flex:1}
+  .cl-version{margin-bottom:18px}
+  .cl-ver-tag{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .cl-ver-num{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-bg);border:1px solid var(--accent);border-radius:5px;padding:2px 8px}
+  .cl-ver-date{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted)}
+  .cl-ver-label{font-size:11px;font-weight:600;color:var(--text);margin-bottom:6px}
+  .cl-item{display:flex;gap:8px;font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:4px}
+  .cl-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px}
+  .cl-dot.new{background:var(--accent)}
+  .cl-dot.fix{background:var(--warn)}
+  .cl-dot.add{background:var(--info)}
+  .cl-divider{height:1px;background:var(--border);margin:14px 0}
+  .cl-footer{display:flex;gap:14px;padding:10px 20px;border-top:1px solid var(--border);flex-shrink:0;background:var(--card)}
+  .cl-leg{display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted)}
 
   /* API Key 버튼 */
   .api-key-btn{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--card);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);transition:all .15s;white-space:nowrap}
@@ -233,12 +257,13 @@
 <header>
   <div class="logo-mark">SM</div>
   <div class="header-info">
-    <div class="header-title">Smart Money Analyzer</div>
+    <div class="header-title">Smart Money Analyzer <span class="ver-badge">ver 1.1</span></div>
     <div class="header-sub">Institutional Flow Intelligence · 기관 수급 분석 엔진</div>
   </div>
   <div class="header-right">
     <div class="today-badge" id="today-badge">──</div>
     <a class="manual-btn" href="./manual.html" target="_blank" title="사용 설명서">📖 사용 설명서</a>
+    <button class="changelog-btn" onclick="openChangelog()" title="업데이트 로그">📋 업데이트 로그</button>
     <button class="api-key-btn" id="api-key-btn" onclick="openModal()">
       <div class="api-key-dot" id="api-key-dot"></div>
       <span id="api-key-label">API Key 설정</span>
@@ -246,6 +271,53 @@
     <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="테마 전환">🌙</button>
   </div>
 </header>
+
+<!-- ── CHANGELOG MODAL ── -->
+<div class="cl-backdrop" id="cl-modal">
+  <div class="cl-modal">
+    <div class="cl-header">
+      <div class="cl-title">📋 업데이트 로그</div>
+      <button class="cl-close" onclick="closeChangelog()">✕</button>
+    </div>
+    <div class="cl-body">
+
+      <div class="cl-version">
+        <div class="cl-ver-tag">
+          <span class="cl-ver-num">ver 1.1</span>
+          <span class="cl-ver-date">2026-03-21</span>
+        </div>
+        <div class="cl-ver-label">분석 알고리즘 5개 규칙 추가</div>
+        <div class="cl-item"><span class="cl-dot fix"></span><span><strong>규칙 C-2</strong> — 롤오버 잔여 OI 판별 추가. 딥 OTM(-30% 이상) + Volume=0 + OI 10배 이상이면 이전 만기 롤오버 잔여물로 판별하여 Max Pain 계산에서 제외. GEX 차트에는 표시하되 주석 부착.</span></div>
+        <div class="cl-item"><span class="cl-dot fix"></span><span><strong>규칙 D-2</strong> — 가용잔고 절댓값→변화율 기준으로 교체. 950K→300K(-68%)를 "충분"으로 오독하는 오류 방지. 전일 대비 Δ% 명시 의무화.</span></div>
+        <div class="cl-item"><span class="cl-dot fix"></span><span><strong>규칙 F</strong> — 볼륨 P/C 만기일 보정 추가. 만기일 당일 볼륨 P/C는 롤오버로 과장되므로 전일 추세와 비교 해석 필수. 만기일 단독 수치를 방향성 신호로 단정 금지.</span></div>
+        <div class="cl-item"><span class="cl-dot add"></span><span><strong>규칙 G</strong> — 프로 OBV 급반전 + Short% 급락(-5%p 이상) 동시 발생 시 숏 커버링으로 우선 해석. "물량 이전" 추상 표현 오용 방지.</span></div>
+        <div class="cl-item"><span class="cl-dot add"></span><span><strong>규칙 H</strong> — OTM IV 급등 → 이진 이벤트 탐지. 현재가 +20% 이상 OTM 콜 IV가 ATM 대비 50%p 이상 높으면 이벤트 프라이싱 신호로 식별 및 이벤트 특정 의무화.</span></div>
+      </div>
+
+      <div class="cl-divider"></div>
+
+      <div class="cl-version">
+        <div class="cl-ver-tag">
+          <span class="cl-ver-num">ver 1.0</span>
+          <span class="cl-ver-date">2026-03-19</span>
+        </div>
+        <div class="cl-ver-label">최초 릴리즈 — 핵심 5개 규칙 + 시각화 시스템</div>
+        <div class="cl-item"><span class="cl-dot new"></span><span><strong>규칙 A</strong> — OBV 컬럼 구분. On-Balance Notional($)과 On-Balance Volume(주수) 혼용 방지.</span></div>
+        <div class="cl-item"><span class="cl-dot new"></span><span><strong>규칙 B</strong> — 옵션 체인 Call=왼쪽 / Put=오른쪽 절대 순서 고정. GEX 부호 역전 방지.</span></div>
+        <div class="cl-item"><span class="cl-dot new"></span><span><strong>규칙 C</strong> — Max Pain 현재가 근방 ATM 기준 계산. -6% 이상 이격 스트라이크 지정 금지.</span></div>
+        <div class="cl-item"><span class="cl-dot new"></span><span><strong>규칙 D</strong> — Short% 급변 3케이스 교차 판별 (MM 헤지 / 투기적 숏 / 합성 헤지).</span></div>
+        <div class="cl-item"><span class="cl-dot new"></span><span><strong>규칙 E</strong> — 리테일 OBV 역전 해석. 기관 흡수율과 조합하여 설계자 물량 이전 or 수급 바닥 판별.</span></div>
+        <div class="cl-item"><span class="cl-dot new"></span><span>GEX 전체 스트라이크 범위 의무화, 섹션별 핵심 포인트 배지, Phase 시계열 구조, Summary-row 폰트 통일, 치코리타 파비콘 적용.</span></div>
+      </div>
+
+    </div>
+    <div class="cl-footer">
+      <span class="cl-leg"><span class="cl-dot new" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-right:3px"></span>신규 기능</span>
+      <span class="cl-leg"><span class="cl-dot add" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--info);margin-right:3px"></span>기능 추가</span>
+      <span class="cl-leg"><span class="cl-dot fix" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--warn);margin-right:3px"></span>오류 수정</span>
+    </div>
+  </div>
+</div>
 
 <div class="main">
   <aside class="sidebar">
@@ -592,18 +664,59 @@ Max Pain = 현재가 근방($0~$3 범위)에서 Call+Put 합산 OI가 가장 집
 현재가로부터 -6% 이상 이격된 스트라이크를 Max Pain으로 지정하지 마십시오.
 (ATM 또는 근거리 스트라이크에서 콜+풋 OI 합산이 최대인 지점이 Max Pain임)
 
+【규칙 C-2 — 롤오버 잔여 OI 판별 (Max Pain 왜곡 방지)】
+현재 분석 만기일보다 이전 만기에서 롤오버된 OI 잔여물이 체인에 남아있을 수 있습니다.
+아래 조건을 모두 충족하면 "롤오버 잔여 OI"로 판별하고 Max Pain 계산에서 제외하십시오:
+  - 현재가 대비 -30% 이상 이격된 딥 OTM 스트라이크 ($20, $17.5 등)
+  - 해당 스트라이크의 당일 거래 Volume = 0 또는 극소 (< 10계약)
+  - OI 절댓값이 인근 스트라이크 대비 비정상적으로 큰 경우 (10배 이상)
+이런 OI는 이전 만기에서 청산되지 않고 남은 잔여물이며, 현재 만기 분석에 반영하면
+Max Pain과 GEX 전체가 하방으로 심각하게 왜곡됩니다.
+단, 이러한 잔여 OI도 GEX 차트에는 표시하되 "롤오버 추정" 주석을 붙여 구분하십시오.
+
 【규칙 D — Short% 해석 프레임】
 Short% 급변은 반드시 아래 3가지 케이스 교차 판별:
-  ① MM 옵션 델타 헤지: 만기일 전후 발생, CTB 낮음, 가용잔고 풍부 → 만기 후 자동 소멸
-  ② 투기적 방향성 숏: CTB 상승 + 가용잔고 감소 + 기관 OBV 역행 동반
+  ① MM 옵션 델타 헤지: 만기일 전후 발생, CTB 낮음, 가용잔고 전일 대비 감소율 < 30% → 만기 후 자동 소멸
+  ② 투기적 방향성 숏: CTB 상승 + 가용잔고 전일 대비 감소율 < 30% 유지 + 기관 OBV 역행 동반
   ③ 기존 롱의 합성 헤지: Short% 급등 + 기관 OBV 양전환 동시 발생
 단순히 "방향성 베어 포지션"으로 단정하지 말 것.
+
+【규칙 D-2 — 가용잔고 해석: 절댓값이 아닌 변화율 기준】
+가용잔고는 절댓값이 아닌 전일 대비 변화율(%)로 해석하십시오.
+  - 예) 950K → 300K: 절댓값 300K는 "충분"처럼 보이지만 변화율 -68% = 대주풀 급격 수축
+  - 가용잔고 전일 대비 -50% 이상 감소: 대주 공급 급감 → 신규 숏 진입 여건 악화 신호
+  - 가용잔고 전일 대비 +50% 이상 증가: 대주 공급 확대 → 숏 수요가 충족되었거나 커버링 후 반납
+절댓값 단독으로 "풍부/부족"을 판단하지 마십시오. 반드시 전일 대비 Δ%를 명시하십시오.
 
 【규칙 E — 리테일 OBV 역전 해석】
 리테일 OBV가 기존 음수(매도)에서 양수(매수)로 역전된 경우:
   - 이를 단순 "리테일 매수"로만 보지 않고
   - 기관 흡수율 급감과 동시 발생 시: "설계자 물량 이전 후 리테일 유입"으로 해석
   - 기관 OBV도 양전환 동시 발생 시: "진짜 수급 바닥" 신호로 해석
+
+【규칙 F — 볼륨 P/C 만기일 보정】
+옵션 만기일(당일) 또는 만기 전날의 볼륨 P/C는 구조적으로 왜곡됩니다:
+  - 만기일: 보유 풋 포지션의 롤오버/청산 거래가 폭증 → 풋 볼륨 과장 → P/C 비율 상승
+  - 따라서 만기일 당일 볼륨 P/C가 1.0 이상(풋 우세)이더라도 이를 방향성 하락 신호로 단정하지 말 것
+  - 만기일 볼륨 P/C 해석 시 반드시 전일(만기 전날) 수치와 비교하여 추세 맥락을 우선 반영하십시오
+  - 예) 3/19 볼륨 P/C 0.44(콜 우세) → 3/20 만기일 1.30 = 만기 롤오버 효과로 상승, 하락 신호가 아님
+이 보정 없이 만기일 볼륨 P/C를 방향성 지표로 쓰면 분석 방향이 역전될 수 있습니다.
+
+【규칙 G — 프로 OBV 급변 + Short% 반전 조합 해석】
+프로 트레이더 OBV가 음수→양수로 급반전하면서 동시에 Short%가 급락(-5%p 이상)하는 경우:
+  - 이 조합은 "기관→프로 물량 이전"이 아니라 숏 커버링(Short Covering)으로 우선 해석하십시오
+  - 판별 근거: 숏 커버링 = 기존 공매도 포지션을 매수로 청산 → 프로 OBV 양전환 + Short% 감소 동시 발생
+  - 교차검증: CTB가 낮고(이지보로우) 가용잔고가 전일 대비 큰 폭 감소했다면 숏 커버링 확정
+  - "물량 이전"이라는 표현은 수급 주체가 다른 경우(기관→프로 실물 주식 이전)에만 사용하십시오
+
+【규칙 H — OTM IV 급등 → 이진 이벤트 탐지】
+IV Skew 분석 시 ATM 비교에만 머물지 말고 OTM 구간 IV 급등을 반드시 확인하십시오:
+  - 현재가 +20% 이상 OTM 콜 구간(예: $38, $40, $45+)의 IV가 ATM 대비 50%p 이상 높은 경우
+  - 또는 딥 OTM 풋 구간($20 이하)의 IV가 400% 이상인 경우
+  → 이는 시장이 특정 만기일 전후의 이진 이벤트(실적, 컨퍼런스, FDA, 계약 발표 등)를 프라이싱하는 신호입니다
+  - 이벤트 콘텍스트(사용자가 입력한 이벤트 정보)와 대조하여 해당 OTM IV 급등의 원인을 명시하십시오
+  - 예) "$38~$50 콜 IV 130~200% 급등 → 3/23~25 RSA 컨퍼런스 발표 기대 프라이싱"
+OTM IV 급등을 탐지하지 못하면 이진 이벤트 시나리오 전체가 분석에서 누락됩니다.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ■ 출력 형식 — 반드시 아래 CSS와 HTML 구조를 그대로 사용할 것
@@ -862,19 +975,24 @@ SECTION 1. 다크풀 레이어 [섹션 헤더에 핵심 포인트 배지 필수]
   · 리테일 OBV 역전 여부 → 설계자 물량 이전 or 진짜 바닥 신호 판별
 
 SECTION 2. 공매도 레이어 [섹션 헤더에 핵심 포인트 배지 필수]
-- grid4 메트릭 카드: Short% 최신(전일Δ포함), CTB Fee, 가용잔고, Short 추정물량(총거래량×Short%)
+- grid4 메트릭 카드: Short% 최신(전일Δ포함), CTB Fee, 가용잔고(전일Δ% 명시), Short 추정물량(총거래량×Short%)
 - Short% + 가용잔고 이중축 라인차트 (shortChart) — 커버링 포인트 그린, 급등 포인트 진한레드 강조, 반드시 포함
 - Short Volume 히스토리 table.t (날짜, Short%, 총거래량, 추정Short물량=TotalVol×Short%)
 - CTB Fee 히스토리 table.t
 - al-neg/al-warn 박스 (구조적 해석 필수):
   · Short% 급변의 원인을 규칙 D에 따라 3케이스 교차 판별하여 명시
-  · CTB(비용압박 여부) + 가용잔고(공급충분여부) + 기관OBV(방향일치여부) 삼중 교차 결론
+  · CTB(비용압박 여부) + 가용잔고 전일 대비 Δ%(절댓값 아닌 변화율 기준) + 기관OBV(방향일치여부) 삼중 교차 결론
+  · 프로 OBV 급변 + Short% 반전 동시 발생 시: 규칙 G에 따라 숏 커버링 여부 우선 판별
 
 SECTION 3. 옵션 레이어 [섹션 헤더에 핵심 포인트 배지 필수]
-- grid4 메트릭 카드: Max Pain(현재가 근방 ATM 기준), OI P/C, 볼륨 P/C, GEX 플립 포인트
+- grid4 메트릭 카드: Max Pain(현재가 근방 ATM 기준, 롤오버 OI 제외 후 계산), OI P/C, 볼륨 P/C(만기일 보정 여부 명시), GEX 플립 포인트
 - GEX 수직 바차트 (gexChart) — 규칙 B 준수(Call=왼쪽, Put=오른쪽), 거리 가중치 적용, 반드시 포함
-- 핵심 OI 구조 table.t: Strike, Call OI, Put OI, Net GEX(추정), 역할 (현재가 근방 hl-a)
-- IV Skew 해석 al 박스: ATM 기준 콜/풋 IV 비교 + 스큐 방향 + 설계자 포지셔닝 추론
+  · 딥 OTM 롤오버 추정 OI는 차트에 표시하되 "롤오버 추정" 주석 명시
+- 핵심 OI 구조 table.t: Strike, Call OI, Put OI, Net GEX(추정), 역할 (현재가 근방 hl-a, 롤오버 추정 hl-r)
+- IV Skew 해석 al 박스:
+  · ATM 기준 콜/풋 IV 비교 + 스큐 방향 + 설계자 포지셔닝 추론
+  · 규칙 H 적용: OTM 구간(현재가 +20% 이상) IV 급등 여부 반드시 확인 → 이진 이벤트 탐지 및 이벤트 특정
+  · 만기일 당일 분석 시: 규칙 F 적용, 볼륨 P/C 만기일 보정 적용 및 전일 추세와 비교
 - 시나리오 al 박스
 
 SECTION 4. 차트 레이어 (L4 있을때만; 없으면 al-info로 "차트 데이터 미제공" 한 줄)
@@ -1238,6 +1356,16 @@ function openFullscreen(){
   if(!lastReportHTML){alert('먼저 분석을 실행하세요.');return}
   const w=window.open('','_blank');w.document.write(lastReportHTML);w.document.close();
 }
+
+// ── CHANGELOG ──
+function openChangelog(){
+  document.getElementById('cl-modal').classList.add('open');
+}
+function closeChangelog(){
+  document.getElementById('cl-modal').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeChangelog(); });
+document.getElementById('cl-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeChangelog(); });
 
 // ── INIT ──
 updateKeyUI();
