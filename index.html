@@ -257,7 +257,7 @@
 <header>
   <div class="logo-mark">SM</div>
   <div class="header-info">
-    <div class="header-title">Smart Money Analyzer <span class="ver-badge">ver 1.1.1</span></div>
+    <div class="header-title">Smart Money Analyzer <span class="ver-badge">ver 1.1.2</span></div>
     <div class="header-sub">Institutional Flow Intelligence · 기관 수급 분석 엔진</div>
   </div>
   <div class="header-right">
@@ -283,6 +283,21 @@
 
       <div class="cl-version">
         <div class="cl-ver-tag">
+          <span class="cl-ver-num">ver 1.1.2</span>
+          <span class="cl-ver-date">2026-03-21</span>
+        </div>
+        <div class="cl-ver-label">설계자 행동 해석 5개 규칙 추가</div>
+        <div class="cl-item"><span class="cl-dot add"></span><span><strong>규칙 I — Theta Burn & L자형 횡보</strong> — 거래량 없는 횡보 지속 시 설계자의 옵션 프리미엄 소멸 작전으로 판별. 판별 기준 3가지 및 리테일 피로 누적 패턴 탐지 로직 추가.</span></div>
+        <div class="cl-item"><span class="cl-dot add"></span><span><strong>규칙 J — 옵션 핀닝 정밀도</strong> — 정규장 종가와 주요 행사가의 오차 ±0.1% 이내 = MM 핀닝 성공으로 해석. 실패가 아닌 설계 의도로 판단하는 기준 추가.</span></div>
+        <div class="cl-item"><span class="cl-dot add"></span><span><strong>규칙 K — Final Absorption</strong> — 하락 끝단의 블록딜 + 가격 밀림 없음 조합을 설계자의 최종 흡수 신호로 판별. 5가지 조건 기반 바닥 다지기 완료 탐지.</span></div>
+        <div class="cl-item"><span class="cl-dot add"></span><span><strong>규칙 L — 거시 유동성(Financial Plumbing)</strong> — 분석 시점에 web_search로 준비금·RRP·SOFR-IORB·DXY 자동 검색. 유동성 환경 판별 결과를 SECTION 5 시나리오 확률에 자동 반영.</span></div>
+        <div class="cl-item"><span class="cl-dot add"></span><span><strong>규칙 M — CTB 낮은 환경의 역설</strong> — CTB Fee 낮음 + 가용잔고 감소 조합 시 설계자의 저비용 가격 억제 선점 경고 의무화. 기술적 반등 신호 오진입 방지(무한 핀 리스크) 경고 추가.</span></div>
+      </div>
+
+      <div class="cl-divider"></div>
+
+      <div class="cl-version">
+        <div class="cl-ver-tag">
           <span class="cl-ver-num">ver 1.1.1</span>
           <span class="cl-ver-date">2026-03-21</span>
         </div>
@@ -302,6 +317,13 @@
           <span class="cl-ver-date">2026-03-21</span>
         </div>
         <div class="cl-ver-label">분석 알고리즘 전면 강화 + 자동 검증·교정 엔진</div>
+
+        <div style="font-size:10px;font-weight:600;color:var(--text);margin:8px 0 4px;">▸ 설계자 행동 해석 (신규)</div>
+        <div class="cl-item"><span class="cl-dot add"></span><span><strong>규칙 I — Theta Burn & L자형 횡보</strong> — 거래량 없는 횡보 지속 시 "설계자의 옵션 프리미엄 소멸 작전"으로 우선 해석. 판별 기준 3가지 + 리테일 지치게 만들기 패턴 탐지.</span></div>
+        <div class="cl-item"><span class="cl-dot add"></span><span><strong>규칙 J — 옵션 핀닝 정밀도</strong> — 종가가 주요 행사가와 ±0.1% 이내 = MM 델타 헤지 비용 최적화(핀닝 성공). 실패가 아닌 설계 의도로 해석.</span></div>
+        <div class="cl-item"><span class="cl-dot add"></span><span><strong>규칙 K — Final Absorption(최종 흡수)</strong> — 하락 끝단 블록딜 + 가격 밀림 없음 조합 = 설계자 바닥 다지기 완료 신호. 5가지 판별 기준 포함.</span></div>
+        <div class="cl-item"><span class="cl-dot add"></span><span><strong>규칙 L — 거시 유동성(Financial Plumbing)</strong> — 분석 시점에 web_search로 준비금·RRP·SOFR-IORB·DXY 자동 검색. 유동성 우호/제한 환경 판별 후 SECTION 5 시나리오 확률에 가중치 반영.</span></div>
+        <div class="cl-item"><span class="cl-dot add"></span><span><strong>규칙 M — CTB 낮은 환경의 역설</strong> — CTB Fee 낮음 + 가용잔고 감소 = 설계자의 저비용 가격 억제 선점 경고. 기술적 반등 신호만으로 진입 시 무한 핀 리스크 경고 의무화.</span></div>
 
         <div style="font-size:10px;font-weight:600;color:var(--text);margin:8px 0 4px;">▸ 오류 수정 (데이터 계산)</div>
         <div class="cl-item"><span class="cl-dot fix"></span><span><strong>규칙 A-2 — Total OBV 자동 교정</strong> — 전체 OBV = 기관+프로+리테일 합산 공식 명시. 이미지 Total 탭과 불일치 시 계산값 우선 적용, 런타임에 자동 교정 후 배지 표시.</span></div>
@@ -856,6 +878,95 @@ IV Skew 분석 시 ATM 비교에만 머물지 말고 OTM 구간 IV 급등을 반
   - 예) "$38~$50 콜 IV 130~200% 급등 → 3/23~25 RSA 컨퍼런스 발표 기대 프라이싱"
 OTM IV 급등을 탐지하지 못하면 이진 이벤트 시나리오 전체가 분석에서 누락됩니다.
 
+【규칙 I — 설계자의 Theta Burn & L자형 횡보 전략 판별】
+급락 후 거래량 없는 횡보가 지속될 경우, 이를 단순한 '지지 확인'이 아니라
+설계자의 의도적 옵션 프리미엄 소멸 작전으로 판별하십시오.
+
+판별 기준 (아래 조건 2개 이상 충족 시 Theta Burn 작전으로 해석):
+  - 볼린저밴드가 수축되는 동안 일평균 거래량이 30일 평균의 60% 이하
+  - 가격 변동폭이 3일 연속으로 ATM 행사가 스프레드의 50% 미만
+  - Short% 변화 없음 + 기관 OBV 정체 (매집도, 청산도 아닌 관망)
+
+해석 지침:
+  - 이 구간에서 리테일 투자자는 포지션 보유 비용(기회비용) 증가로 지쳐 청산 압력을 받음
+  - 콜 및 풋 양방향 OTM 옵션 프리미엄이 동시에 소멸 → 설계자가 최소 비용으로 가격 통제권 유지
+  - "L자형 횡보 = 설계자의 무기: 시간과 프리미엄 소멸을 동시에 활용"
+  - 이 패턴 이후 거래량 급증 + BB 폭발 = 설계자가 원하는 방향으로 이동 개시 신호
+
+【규칙 J — 옵션 핀닝(Pinning) 정밀도 해석】
+정규장 종가가 주요 행사가(OI 상위 Strike)와 근접하게 형성될 경우,
+이를 마켓메이커의 델타 헤지 비용 최적화 행동(핀닝)으로 해석하십시오.
+
+핀닝 판별 기준:
+  - 정규장 종가가 주요 행사가 대비 ±0.1% 이내 = 핀닝 성공
+  - 정규장 종가가 주요 행사가 대비 ±0.5% 이내 = 핀닝 시도 흔적
+
+해석 지침:
+  - 종가 = 행사가에서 딱 $0.05 아래/위 = "실패"가 아님. 이것이 MM의 헤지 비용 최소화 지점
+  - 핀닝 대상 행사가는 반드시 GEX 차트에서 (±)GEX 값이 가장 큰 스트라이크를 우선 확인
+  - 핀닝 성공 이후 다음 만기까지 가격이 해당 스트라이크를 중심으로 재배치될 가능성 높음
+  - "종가 ≈ 행사가 = 우연이 아니라 설계다"
+
+【규칙 K — 거대 자본의 최종 흡수(Final Absorption) 신호】
+하락 추세 끝단에서 발생하는 블록딜 집중과 클로징 크로스를 단순 정산이 아니라
+설계자의 '하방 물량 통매수(Absorption)'로 해석하십시오.
+
+최종 흡수 판별 기준 (아래 조건 3개 이상 충족 시 Final Absorption으로 간주):
+  - 2일 이상 연속 15:30~16:00 구간 또는 애프터마켓에 블록딜 집중
+  - 블록딜 발생 시 가격 밀림(추가 하락) 없음 — 매도 물량을 받아내도 가격 유지
+  - 다크풀 비중 40% 이상의 대규모 거래 (Off-exchange 흡수)
+  - CTB Fee 안정 또는 하락 (공매도 수요 감소 = 하방 베팅 종료)
+  - Short% 감소 추세 동반
+
+해석 지침:
+  - 가격 밀림 없는 대량 블록딜 = 설계자가 패닉셀 물량을 저가에 흡수 중
+  - 이 신호가 주봉 120MA 근방 또는 GEX (−)최대값 구간에서 발생하면 바닥 신뢰도 극대화
+  - "거래 기둥 + 가격 안정 = 설계자의 바닥 다지기 완료"
+  - Final Absorption 확인 후 다음 세션의 기관 OBV 방향이 결정적 확증 신호
+
+【규칙 L — 거시 유동성 환경(Financial Plumbing) 연결 분석】
+개별 종목 수급 분석 시, 시장 전반의 거시 유동성 환경이 해당 종목에 미치는 영향을
+SECTION 5 시나리오 해석에 반드시 반영하십시오.
+
+거시 데이터는 web_search 도구로 분석 시점에 자동 검색하십시오.
+아래 지표를 SECTION 0 검색 또는 SECTION 5 작성 직전에 검색하여 최신값을 확보하십시오:
+  - 검색어 예시: "Fed reserve balance current 2026", "RRP overnight repo balance",
+    "SOFR IORB spread today", "DXY dollar index today", "risk on risk off market today"
+
+유동성 환경 판별 프레임:
+  공격적 스퀴즈에 우호적인 환경:
+    - Fed 은행 준비금 증가 추세 / 역레포(RRP) 잔고 감소
+    - SOFR-IORB 스프레드 안정 (시스템 내 달러 유동성 충분)
+    - DXY 약세 + 위험자산 선호 환경
+  스퀴즈를 제한하는 환경:
+    - 준비금 감소 / T-bill 공급 증가로 유동성 흡수
+    - SOFR-IORB 스프레드 확대 (달러 수요 증가)
+    - DXY 강세 + 위험자산 회피 환경
+
+SECTION 5 통합 시나리오에 반영:
+  - 우호적 환경 확인 시: 상방 시나리오 확률 소폭 상향 (+5~10%p), 목표가 달성 가능성 언급
+  - 제한적 환경 확인 시: 기술적 반등도 유동성 벽에 막힐 가능성 경고, 하방 리스크 가중
+  - web_search로 데이터 확보 실패 시: "(거시 유동성 검색 실패 — 수동 확인 권장)" 명시하고
+    거시 반영 없이 미시 수급 기반으로만 확률 산출
+
+【규칙 M — CTB Fee 낮은 환경의 역설적 해석 (가격 억제 비용 선점)】
+CTB Fee가 낮을 때 이를 단순한 '이지보로우(공매도 쉬움)' 신호로만 보지 말고,
+설계자가 저렴한 비용으로 가격 억제 도구를 선점하고 있을 가능성을 함께 판별하십시오.
+
+역설적 해석 기준:
+  - CTB Fee 낮음(< 1%) + 가용잔고 감소 조합:
+    → "저비용 공매도 포지션 유지 가능 = 설계자가 제한된 비용으로 가격을 무기한 누를 수 있는 환경"
+  - CTB Fee 낮음 + 가용잔고 충분:
+    → 전통적 이지보로우 해석 (투기적 숏 진입 비용 낮음)
+  - CTB Fee 상승 + 가용잔고 급감:
+    → 숏스퀴즈 압력 증가 (기존 규칙 D 해석 적용)
+
+경고 지침:
+  - CTB 0.5% 이하 환경에서 주가가 하락하고 있다면:
+    "설계자가 공짜에 가까운 비용으로 가격 억제를 지속할 수 있다 — 기술적 반등 신호만으로
+    포지션 진입 시 '무한 핀 리스크'에 노출될 수 있음"을 반드시 경고하십시오
+  - CTB가 낮아도 Final Absorption 신호(규칙 K)가 동반되면 설계자의 전략이 전환된 것으로 판별
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ■ 출력 형식 — 반드시 아래 CSS와 HTML 구조를 그대로 사용할 것
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1192,6 +1303,7 @@ SECTION 1. 다크풀 레이어 [섹션 헤더에 핵심 포인트 배지 필수]
   · 기관 흡수율 수치 명시 + 의미(전일 대비 증감 + 관망/적극매집/완료 판별)
   · 기관 VWAP 앵커(마감 전 집중 체결 구간) 명시
   · 리테일 OBV 역전 여부 → 설계자 물량 이전 or 진짜 바닥 신호 판별
+  · 규칙 K 적용: 하락 추세 끝단의 블록딜 + 가격 밀림 없음 조합 → Final Absorption 여부 판별
 
 SECTION 2. 공매도 레이어 [섹션 헤더에 핵심 포인트 배지 필수]
 - grid4 메트릭 카드: Short% 최신(전일Δ포함), CTB Fee, 가용잔고(전일Δ% 명시), Short 추정물량(총거래량×Short%)
@@ -1202,6 +1314,7 @@ SECTION 2. 공매도 레이어 [섹션 헤더에 핵심 포인트 배지 필수]
   · Short% 급변의 원인을 규칙 D에 따라 3케이스 교차 판별하여 명시
   · CTB(비용압박 여부) + 가용잔고 전일 대비 Δ%(절댓값 아닌 변화율 기준) + 기관OBV(방향일치여부) 삼중 교차 결론
   · 프로 OBV 급변 + Short% 반전 동시 발생 시: 규칙 G에 따라 숏 커버링 여부 우선 판별
+  · 규칙 M 적용: CTB Fee 낮음 + 가용잔고 감소 조합 시 "설계자 저비용 가격 억제 선점" 경고 포함
 
 SECTION 3. 옵션 레이어 [섹션 헤더에 핵심 포인트 배지 필수]
 - grid4 메트릭 카드: Max Pain(현재가 근방 ATM 기준, 롤오버 OI 제외 후 계산), OI P/C, 볼륨 P/C(만기일 보정 여부 명시), GEX 플립 포인트
@@ -1210,6 +1323,7 @@ SECTION 3. 옵션 레이어 [섹션 헤더에 핵심 포인트 배지 필수]
 - 핵심 OI 구조 table.t: Strike, Call OI, Put OI, Net GEX(추정), 역할 (현재가 근방 hl-a, 롤오버 추정 hl-r)
 - IV Skew 해석 al 박스:
   · ATM 기준 콜/풋 IV 비교 + 스큐 방향 + 설계자 포지셔닝 추론
+  · 규칙 J 적용: 정규장 종가가 주요 행사가와 ±0.1% 이내인 경우 핀닝 성공으로 명시
   · 규칙 H 적용: OTM 구간(현재가 +20% 이상) IV 급등 여부 반드시 확인 → 이진 이벤트 탐지 및 이벤트 특정
   · 만기일 당일 분석 시: 규칙 F 적용, 볼륨 P/C 만기일 보정 적용 및 전일 추세와 비교
 - 시나리오 al 박스
@@ -1226,6 +1340,8 @@ SECTION 5. 3-Layer 통합 시나리오 [섹션 헤더에 핵심 포인트 배지
   · Short% 방향 ↔ 기관OBV 방향 일치여부(스퀴즈코일 vs 방향성숏)
   · GEX 플립존 ↔ 현재가 ↔ BB수축 삼중교차
   · 신호 정렬(all-in) → 고확신 집중 / 신호 분기 → 확률 분산 + 결정적 트리거 명시
+  · 규칙 I 적용: 거래량 없는 횡보 지속 시 Theta Burn 작전 여부 판별 및 명시
+  · 규칙 L 적용: web_search로 거시 유동성 지표 자동 검색 → 환경 판별 후 시나리오 확률에 반영
 - Phase 1/2/3 phase-row (시계열 엄수: 완료날짜→오늘→미래날짜)
   · 날짜는 반드시 실제 NYSE 거래일 기준. 주말·공휴일 포함 금지. 위 캘린더 규칙 적용.
 - 확률 매트릭스 수평 바차트 (scenChart) — X축 max:80, 데이터 기반 시나리오명
