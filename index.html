@@ -1606,7 +1606,15 @@ function downloadReport(){
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download=`SmartMoney_${ticker}_${getToday().iso}.html`;a.click();URL.revokeObjectURL(url);
 }
-function printReport(){const f=document.getElementById('output-iframe');if(f.contentWindow)f.contentWindow.print()}
+function printReport(){
+  if(!lastReportHTML){alert('먼저 분석을 실행하세요.');return;}
+  const w=window.open('','_blank');
+  w.document.write(lastReportHTML);
+  w.document.close();
+  w.onload=()=>{w.focus();w.print();};
+  // fallback: 일부 브라우저에서 onload가 발화 안 될 경우
+  setTimeout(()=>{try{w.focus();w.print();}catch(e){}},600);
+}
 function openFullscreen(){
   if(!lastReportHTML){alert('먼저 분석을 실행하세요.');return}
   const w=window.open('','_blank');w.document.write(lastReportHTML);w.document.close();
