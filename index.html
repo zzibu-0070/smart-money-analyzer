@@ -185,7 +185,7 @@
   .t-btn-green.visible{display:block}
 
   .output-frame-wrap{flex:1;overflow:hidden;position:relative}
-  #output-iframe{width:100%;height:100%;border:none;background:#fff}
+  #output-iframe{width:100%;height:100%;border:none;background:var(--bg, #fff)}
 
   .empty-state{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;background:var(--bg);transition:opacity .25s}
   .empty-state.hidden{opacity:0;pointer-events:none}
@@ -517,6 +517,35 @@ function toggleTheme() {
   isDark = !isDark;
   document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
   document.getElementById('theme-toggle').textContent = isDark ? '☀️' : '🌙';
+  document.getElementById('output-iframe').style.background = isDark ? '#0D1117' : '#fff';
+  syncReportTheme();
+}
+
+function syncReportTheme() {
+  try {
+    const iframe = document.getElementById('output-iframe');
+    const iDoc = iframe.contentDocument || iframe.contentWindow.document;
+    if (!iDoc || !iDoc.documentElement) return;
+    iDoc.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    // Chart.js 재렌더: 테마 변수 업데이트 후 모든 차트 re-render
+    const iWin = iframe.contentWindow;
+    if (iWin && iWin.Chart) {
+      const gc = isDark ? '#21262D' : '#EAEEF2';
+      const tc = isDark ? '#8B949E' : '#656D76';
+      Object.values(iWin.Chart.instances).forEach(chart => {
+        try {
+          if (chart.options.scales) {
+            Object.values(chart.options.scales).forEach(scale => {
+              if (scale.grid) scale.grid.color = gc;
+              if (scale.ticks) scale.ticks.color = tc;
+              if (scale.title) scale.title.color = tc;
+            });
+          }
+          chart.update('none');
+        } catch(e) {}
+      });
+    }
+  } catch(e) {}
 }
 
 // ── API KEY (sessionStorage) ──
@@ -1026,22 +1055,20 @@ Chart.js CDN 반드시 포함: [script src="https://cdnjs.cloudflare.com/ajax/li
   --kp-info-bg:#DDF4FF;--kp-info-c:#0550AE;--kp-info-bd:#0969DA;
   --s0-card:#F6F8FA;--s0-title:#1F2328;--s0-text:#656D76;--s0-sep:#EAEEF2;--s0-date:#9A6700;
 }
-@media(prefers-color-scheme:dark){
-  :root{
-    --bg:#0D1117;--card:#161B22;--panel:#21262D;--bd:#30363D;
-    --t1:#E6EDF3;--t2:#8B949E;
-    --al-pos-bg:#0F3D2E;--al-pos-c:#7EE2B8;
-    --al-neg-bg:#3D1C1C;--al-neg-c:#FF7B72;
-    --al-warn-bg:#3D2E0A;--al-warn-c:#E3B341;
-    --al-info-bg:#0D2A4A;--al-info-c:#79C0FF;
-    --hl-g:#0F3D2E;--hl-a:#3D2E0A;--hl-r:#3D1C1C;
-    --ph1-bg:#3D2E0A;--ph2-bg:#0D2A4A;--ph3-bg:#0F3D2E;
-    --kp-pos-bg:#0F3D2E;--kp-pos-c:#7EE2B8;
-    --kp-neg-bg:#3D1C1C;--kp-neg-c:#FF7B72;
-    --kp-warn-bg:#3D2E0A;--kp-warn-c:#E3B341;
-    --kp-info-bg:#0D2A4A;--kp-info-c:#79C0FF;
-    --s0-card:#161B22;--s0-title:#E6EDF3;--s0-text:#8B949E;--s0-sep:#21262D;--s0-date:#E3B341;
-  }
+[data-theme="dark"]{
+  --bg:#0D1117;--card:#161B22;--panel:#21262D;--bd:#30363D;
+  --t1:#E6EDF3;--t2:#8B949E;
+  --al-pos-bg:#0F3D2E;--al-pos-c:#7EE2B8;
+  --al-neg-bg:#3D1C1C;--al-neg-c:#FF7B72;
+  --al-warn-bg:#3D2E0A;--al-warn-c:#E3B341;
+  --al-info-bg:#0D2A4A;--al-info-c:#79C0FF;
+  --hl-g:#0F3D2E;--hl-a:#3D2E0A;--hl-r:#3D1C1C;
+  --ph1-bg:#3D2E0A;--ph2-bg:#0D2A4A;--ph3-bg:#0F3D2E;
+  --kp-pos-bg:#0F3D2E;--kp-pos-c:#7EE2B8;
+  --kp-neg-bg:#3D1C1C;--kp-neg-c:#FF7B72;
+  --kp-warn-bg:#3D2E0A;--kp-warn-c:#E3B341;
+  --kp-info-bg:#0D2A4A;--kp-info-c:#79C0FF;
+  --s0-card:#161B22;--s0-title:#E6EDF3;--s0-text:#8B949E;--s0-sep:#21262D;--s0-date:#E3B341;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--t1);padding:24px;max-width:960px;margin:0 auto}
@@ -1109,9 +1136,9 @@ h1{font-size:18px;font-weight:700;color:var(--t1);margin-bottom:4px}
 .s0-badge-sec{background:var(--kp-warn-bg);color:var(--kp-warn-c);border:0.5px solid var(--kp-warn-bd)}
 \`\`\`
 
-■ Chart.js 전역 설정 (script 최상단에 반드시 포함 — 다크모드 자동 감지)
+■ Chart.js 전역 설정 (script 최상단에 반드시 포함 — 앱 토글 테마 감지)
 \`\`\`javascript
-const isDark=window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches;
+const isDark=document.documentElement.getAttribute('data-theme')==='dark';
 const F='-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
 const gc=isDark?'#21262D':'#EAEEF2';
 const tc=isDark?'#8B949E':'#656D76';
@@ -1609,6 +1636,10 @@ async function startAnalysis() {
 
     lastReportHTML=html;
 
+    // 생성된 리포트에 현재 앱 테마를 data-theme 속성으로 주입
+    const themeAttr = isDark ? 'data-theme="dark"' : 'data-theme="light"';
+    html = html.replace(/<html(\s|>)/i, `<html ${themeAttr}$1`);
+
     // ── POST-PROCESSING VALIDATOR ──
     // 생성된 HTML에 자동 검증·교정 스크립트 주입
     html = injectReportValidator(html);
@@ -1619,6 +1650,8 @@ async function startAnalysis() {
     setTimeout(()=>{
       showLoading(false);
       document.getElementById('output-iframe').srcdoc=html;
+      // 리포트 로드 완료 후 현재 앱 테마 동기화
+      document.getElementById('output-iframe').onload = () => { syncReportTheme(); };
       document.getElementById('save-md-btn').classList.add('visible');
       setStatus('done',`완료 · ${ticker} · ${today.display}${memoContent?' · 전일연동':''}`);
     },350);
